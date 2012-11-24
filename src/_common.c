@@ -8,10 +8,19 @@
 #include <gsl/gsl_errno.h>
 #endif
 
+#include <glib.h>
+#include <gmodule.h>
+
 #include "_common.h"
 
-// TODO: Don't use USE_GSL to prevent compile-time dep on gsl.
+const gchar *refmem_module_check_init( GModule *module );
+export const gchar *g_module_check_init( GModule *module ) {
+	const gchar *ret;
+	if( (ret = refmem_module_check_init(module)) != NULL ) return ret;
+	return NULL;
+}
 
+// TODO: Don't use USE_GSL to prevent compile-time dep on gsl.
 #ifndef NDEBUG
 #ifdef USE_GSL
 static void gsl_error_handler( const char * reason, const char * file, int line, int gsl_errno ) {
