@@ -11,9 +11,9 @@
 #include <glib.h>
 #include <gmodule.h>
 
-#include "_common.h"
+#include <rehlib/common.h>
+#include "_refmem.h"
 
-const gchar *refmem_module_check_init( GModule *module );
 export const gchar *g_module_check_init( GModule *module ) {
 	const gchar *ret;
 	if( (ret = refmem_module_check_init(module)) != NULL ) return ret;

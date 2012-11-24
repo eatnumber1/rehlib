@@ -1,14 +1,6 @@
 REHLIB := $(CURDIR)/librehlib.$(LIBRARY_SUFFIX)
-REHLIB_TEST := $(REHLIB:%.$(LIBRARY_SUFFIX)=%_test.$(LIBRARY_SUFFIX))
 
-SRC_SOURCES := _common.c refmem.c GBTError.c
+SRC_SOURCES := common.c refmem.c GBTError.c
 SRC_SOURCES := $(SRC_SOURCES:%=$(CURDIR)/%)
 SRC_OBJECTS := $(SRC_SOURCES:.c=.o)
 SRC_DEPS := $(SRC_SOURCES:.c=.d)
-
-SRC_TEST_SOURCES := _common.c refmem_test.c GBTError.c
-SRC_TEST_SOURCES := $(SRC_TEST_SOURCES:%=$(CURDIR)/%)
-SRC_TEST_OBJECTS := $(SRC_TEST_SOURCES:.c=.o)
-SRC_TEST_DEPS := $(SRC_TEST_SOURCES:.c=.d)
-
-TESTS := $(TESTS) $(REHLIB_TEST)

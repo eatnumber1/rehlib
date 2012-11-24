@@ -1,6 +1,6 @@
-#include "refmem.h"
+#include <rehlib/refmem.h>
 
-#include "GBTError.h"
+#include <rehlib/GBTError.h>
 
 #include <glib.h>
 #include <gmodule.h>
@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <errno.h>
 
-#include "_common.h"
+#include <rehlib/common.h>
 
 typedef struct {
 	volatile gint refcnt;

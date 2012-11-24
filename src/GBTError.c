@@ -1,4 +1,4 @@
-#include "GBTError.h"
+#include <rehlib/GBTError.h>
 
 #include <glib.h>
 
