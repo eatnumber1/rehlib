@@ -3,7 +3,7 @@
 src/all: $(REHLIB)
 
 src/clean:
-	$(RM) $(SRC_OBJECTS) $(REFMEM_OBJECTS) $(REHLIB)
+	$(RM) $(SRC_OBJECTS) $(REFMEM_OBJECTS) $(REHLIB) $(REFMEM_LIB)
 
 src/depclean:
 	$(RM) $(SRC_DEPS) $(REFMEM_DEPS)
