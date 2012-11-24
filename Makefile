@@ -61,6 +61,7 @@ define subdirRule
  $$$(1)/all: CURDIR := $$(CURDIR)
  $$$(1)/clean: CURDIR := $$(CURDIR)
  $$$(1)/depclean: CURDIR := $$(CURDIR)
+ $$$(1)/test: CURDIR := $$(CURDIR)
  include $$(CURDIR)/Makefile
 endef
 # This is what actually does the work.
