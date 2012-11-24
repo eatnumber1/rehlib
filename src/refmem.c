@@ -28,7 +28,7 @@ static GMemVTable vtable = {
 	.try_realloc = realloc
 };
 
-const gchar *g_module_check_init( GModule *module ) {
+export const gchar *g_module_check_init( GModule *module ) {
 	g_module_make_resident(module);
 	return NULL;
 }
@@ -341,7 +341,7 @@ static void test_oom_alloc( RefmemOOMTestFixture *fixture, const void *data ) {
 	}
 }
 
-void register_tests() {
+export void register_tests() {
 	g_test_add("/refmem/oom/try_alloc", RefmemOOMTestFixture, NULL, test_oom_setup, test_oom_try_alloc, test_oom_teardown);
 	g_test_add("/refmem/oom/alloc", RefmemOOMTestFixture, NULL, test_oom_setup, test_oom_alloc, test_oom_teardown);
 	g_test_add("/refmem/alloc", RefmemTestFixture, NULL, test_setup, test_alloc, test_teardown);
