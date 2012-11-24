@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <setjmp.h>
 
 #include "_common.h"
 
@@ -76,7 +77,7 @@ export void *refmem_alloc( gsize size ) {
 	void *ret = _refmem_alloc(vtable.malloc, size);
 	if( ret == NULL ) {
 		oom_handler(oom_context);
-		return NULL;
+		g_assert_not_reached();
 	}
 	return ret;
 }
@@ -105,7 +106,7 @@ export void *refmem_realloc( void *mem, gsize size ) {
 	mem = _refmem_realloc(vtable.realloc, mem, size);
 	if( mem == NULL ) {
 		oom_handler(oom_context);
-		return NULL;
+		g_assert_not_reached();
 	}
 	return mem;
 }
@@ -279,11 +280,18 @@ static void test_oom_free() {
 	g_assert_not_reached();
 }
 
-static void test_oom_handler( bool *called ) {
-	*called = true;
+typedef struct {
+	bool handler_called;
+	jmp_buf handler_escape;
+} RefmemOOMTestFixture;
+
+static void test_oom_handler( RefmemOOMTestFixture *fixture ) {
+	fixture->handler_called = true;
+	longjmp(fixture->handler_escape, true);
+	g_assert_not_reached();
 }
 
-static void test_oom_setup( bool *oom_handler_called, const void *data ) {
+static void test_oom_setup( RefmemOOMTestFixture *fixture, const void *data ) {
 	(void) data;
 	GMemVTable vt;
 	memset(&vt, 0, sizeof(GMemVTable));
@@ -292,40 +300,50 @@ static void test_oom_setup( bool *oom_handler_called, const void *data ) {
 	vt.realloc = (void *(*)(void *, size_t)) test_oom_allocator;
 	refmem_set_vtable(&vt);
 
-	*oom_handler_called = false;
-	refmem_set_oom_handler((OOMHandler) test_oom_handler, oom_handler_called);
+	fixture->handler_called = false;
+	refmem_set_oom_handler((OOMHandler) test_oom_handler, fixture);
 }
 
-static void test_oom_teardown( bool *oom_handler_called, const void *data ) {
-	(void) data, (void) oom_handler_called;
+static void test_oom_teardown( RefmemOOMTestFixture *fixture, const void *data ) {
+	(void) data, (void) fixture;
 	refmem_default_vtable();
 	refmem_default_oom_handler();
 }
 
-static void test_oom_try_alloc( bool *oom_handler_called, const void *data ) {
+static void test_oom_try_alloc( RefmemOOMTestFixture *fixture, const void *data ) {
 	(void) data;
-	GBTError *err = NULL;
-	void *mem = refmem_try_alloc(sizeof(char), &err);
-	if( errno != ENOMEM || mem != NULL || *oom_handler_called || err == NULL || err->gerror->code != REFMEM_ERROR_ERRNO ) {
-		g_test_fail();
+	if( !setjmp(fixture->handler_escape) ) {
+		GBTError *err = NULL;
+		void *mem = refmem_try_alloc(sizeof(char), &err);
+		if( errno != ENOMEM || mem != NULL || fixture->handler_called || err == NULL || err->gerror->code != REFMEM_ERROR_ERRNO ) {
+			g_test_fail();
+			g_bt_error_free(&err);
+			return;
+		}
 		g_bt_error_free(&err);
+	} else {
+		g_test_fail();
 		return;
 	}
-	g_bt_error_free(&err);
 }
 
-static void test_oom_alloc( bool *oom_handler_called, const void *data ) {
+static void test_oom_alloc( RefmemOOMTestFixture *fixture, const void *data ) {
 	(void) data;
-	void *mem = refmem_alloc(sizeof(char));
-	if( errno != ENOMEM || mem != NULL || !*oom_handler_called ) {
+	if( !setjmp(fixture->handler_escape) ) {
+		refmem_alloc(sizeof(char));
 		g_test_fail();
 		return;
+	} else {
+		if( errno != ENOMEM || !fixture->handler_called ) {
+			g_test_fail();
+			return;
+		}
 	}
 }
 
 void register_tests() {
-	g_test_add("/refmem/oom/try_alloc", bool, NULL, test_oom_setup, test_oom_try_alloc, test_oom_teardown);
-	g_test_add("/refmem/oom/alloc", bool, NULL, test_oom_setup, test_oom_alloc, test_oom_teardown);
+	g_test_add("/refmem/oom/try_alloc", RefmemOOMTestFixture, NULL, test_oom_setup, test_oom_try_alloc, test_oom_teardown);
+	g_test_add("/refmem/oom/alloc", RefmemOOMTestFixture, NULL, test_oom_setup, test_oom_alloc, test_oom_teardown);
 	g_test_add("/refmem/alloc", RefmemTestFixture, NULL, test_setup, test_alloc, test_teardown);
 	g_test_add("/refmem/unref", RefmemTestFixture, NULL, test_setup, test_unref, test_teardown);
 	g_test_add("/refmem/ref", RefmemTestFixture, NULL, test_setup, test_ref, test_teardown);
