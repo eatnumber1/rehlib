@@ -35,7 +35,7 @@ static GQuark refmem_error_quark() {
 	return g_quark_from_static_string("refmem-error-quark");
 }
 
-noreturn static void oom() {
+static void NORETURN oom() {
 	g_error("%s\n", g_strerror(errno));
 	g_assert_not_reached();
 }
@@ -51,7 +51,7 @@ static void *as_mem( RefMemory *mem ) {
 	return (void *) (((char *) mem) + offsetof(RefMemory, data));
 }
 
-export void refmem_set_oom_handler( OOMHandler handler, void *context ) {
+void EXPORT refmem_set_oom_handler( OOMHandler handler, void *context ) {
 	static GMutex mutex;
 
 	g_mutex_lock(&mutex);
@@ -60,7 +60,7 @@ export void refmem_set_oom_handler( OOMHandler handler, void *context ) {
 	g_mutex_unlock(&mutex);
 }
 
-export void refmem_default_oom_handler() {
+void EXPORT refmem_default_oom_handler() {
 	refmem_set_oom_handler((OOMHandler) oom, NULL);
 }
 
@@ -71,7 +71,7 @@ static void *_refmem_alloc( void *(*_malloc)( gsize ), gsize size ) {
 	return as_mem(refmem);
 }
 
-export void *refmem_alloc( gsize size ) {
+void * EXPORT refmem_alloc( gsize size ) {
 	void *ret = _refmem_alloc(vtable.malloc, size);
 	if( ret == NULL ) {
 		oom_handler(oom_context);
@@ -80,7 +80,7 @@ export void *refmem_alloc( gsize size ) {
 	return ret;
 }
 
-export void *refmem_try_alloc( gsize size, GBTError **error ) {
+void * EXPORT refmem_try_alloc( gsize size, GBTError **error ) {
 	void *mem = _refmem_alloc(vtable.try_malloc, size);
 	if( mem == NULL ) {
 		int saved_errno = errno;
@@ -100,7 +100,7 @@ static void *_refmem_realloc( void *(*_realloc)( void *, gsize ), void *mem, gsi
 	return _realloc(refmem, sizeof(RefMemory) + size);
 }
 
-export void *refmem_realloc( void *mem, gsize size ) {
+void * EXPORT refmem_realloc( void *mem, gsize size ) {
 	mem = _refmem_realloc(vtable.realloc, mem, size);
 	if( mem == NULL ) {
 		oom_handler(oom_context);
@@ -109,7 +109,7 @@ export void *refmem_realloc( void *mem, gsize size ) {
 	return mem;
 }
 
-export void *refmem_try_realloc( void *mem, gsize size, GBTError **error ) {
+void * EXPORT refmem_try_realloc( void *mem, gsize size, GBTError **error ) {
 	mem = _refmem_realloc(vtable.try_realloc, mem, size);
 	if( mem == NULL ) {
 		int saved_errno = errno;
@@ -120,12 +120,12 @@ export void *refmem_try_realloc( void *mem, gsize size, GBTError **error ) {
 	return mem;
 }
 
-export void refmem_ref( void *mem ) {
+void EXPORT refmem_ref( void *mem ) {
 	RefMemory *refmem = as_refmem(mem);
 	g_atomic_int_inc(&refmem->refcnt);
 }
 
-export void refmem_unref( void *mem ) {
+void EXPORT refmem_unref( void *mem ) {
 	RefMemory *refmem = as_refmem(mem);
 	if( g_atomic_int_dec_and_test(&refmem->refcnt) ) {
 		vtable.free(refmem);
@@ -140,7 +140,7 @@ static void *_refmem_calloc( gsize count, gsize size ) {
 	return ret;
 }
 
-export void refmem_set_vtable( GMemVTable *vt ) {
+void EXPORT refmem_set_vtable( GMemVTable *vt ) {
 	static GMutex mutex;
 
 	g_mutex_lock(&mutex);
@@ -151,7 +151,7 @@ export void refmem_set_vtable( GMemVTable *vt ) {
 	g_mutex_unlock(&mutex);
 }
 
-export void refmem_default_vtable() {
+void EXPORT refmem_default_vtable() {
 	GMemVTable vtable;
 	memset(&vtable, 0, sizeof(GMemVTable));
 	vtable.malloc = malloc;

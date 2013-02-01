@@ -20,10 +20,13 @@ extern "C" {
 # define __has_attribute(x) 0 // Compatibility with non-clang compilers.
 #endif /* __has_attribute */
 
-#define export __attribute__((visibility("default")))
-#define overloadable __attribute__((overloadable))
-#define sentinel __attribute__((sentinel))
-#define noreturn __attribute__((noreturn))
+#define EXPORT __attribute__((visibility("default")))
+#define OVERLOADABLE __attribute__((overloadable))
+#define SENTINEL __attribute__((sentinel))
+#define NORETURN __attribute__((noreturn))
+#define ALWAYS_INLINE __attribute__((always_inline))
+#define CONSTRUCTOR __attribute__((constructor))
+#define DESTRUCTOR __attribute__((destructor))
 
 #if !__has_extension(c_static_assert)
 # define _Static_assert(a, b, s)

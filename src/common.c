@@ -14,7 +14,7 @@
 #include <rehlib/common.h>
 #include "_refmem.h"
 
-export const gchar *g_module_check_init( GModule *module ) {
+const gchar * EXPORT g_module_check_init( GModule *module ) {
 	const gchar *ret;
 	if( (ret = refmem_module_check_init(module)) != NULL ) return ret;
 	return NULL;
@@ -28,14 +28,12 @@ static void gsl_error_handler( const char * reason, const char * file, int line,
 	abort();
 }
 
-__attribute__((constructor))
-static void kill_on_gsl_error() {
+static void CONSTRUCTOR kill_on_gsl_error() {
 	gsl_set_error_handler(gsl_error_handler);
 }
 #endif /* USE_GSL */
 # ifdef __APPLE__
-__attribute__((destructor))
-static void leak_sleep() {
+static void DESTRUCTOR leak_sleep() {
 	if( getenv("LEAK_CHECK") != NULL ) {
 		unsigned int seconds = 100;
 		const char *secs_s = getenv("LEAK_CHECK_SECONDS");
@@ -53,8 +51,7 @@ static void leak_sleep() {
 # endif /* __APPLE__ */
 #else /* NDEBUG */
 #ifdef USE_GSL
-__attribute__((constructor))
-static void disable_gsl_abort() {
+static void CONSTRUCTOR disable_gsl_abort() {
 	gsl_set_error_handler_off();
 }
 #endif /* USE_GSL */
