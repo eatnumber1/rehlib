@@ -38,11 +38,11 @@ G_BEGIN_DECLS
 #define sprintfa(ret, format, args...) \
 	({ \
 		char **_ret = (ret); \
-		const char *_format = (format); \
 		int retlen = -1; \
 		if( _ret == NULL ) { \
 			errno = EINVAL; \
 		} else { \
+			const char *_format = (format); \
 			size_t len = snprintf(NULL, 0, _format, args); \
 			*_ret = alloca((len * sizeof(char)) + 1); \
 			retlen = sprintf(*_ret, _format, args); \

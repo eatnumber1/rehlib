@@ -9,12 +9,14 @@
 
 static void test_vsprintfa_hello_internal( int dummy, ... ) {
 	char *str;
+	const char *expected = "Hello World!";
 
 	va_list ap;
 	va_start(ap, dummy);
 	int ret = vsprintfa(&str, "Hello %s!", ap);
 	va_end(ap);
-	size_t len = strlen("Hello World!");
+	size_t len = strlen(expected);
+	g_assert(strcmp(expected, str) == 0);
 	g_assert(ret >= 0);
 	size_t uret = (size_t) ret;
 	g_assert(uret == len);
@@ -26,9 +28,11 @@ static void test_vsprintfa_hello() {
 
 static void test_sprintfa_hello() {
 	char *str;
+	const char *expected = "Hello World!";
 
 	int ret = sprintfa(&str, "Hello %s!", "World");
-	size_t len = strlen("Hello World!");
+	size_t len = strlen(expected);
+	g_assert(strcmp(expected, str) == 0);
 	g_assert(ret >= 0);
 	size_t uret = (size_t) ret;
 	g_assert(uret == len);
