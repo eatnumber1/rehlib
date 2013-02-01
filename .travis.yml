@@ -2,7 +2,6 @@ script: make test
 language: c
 compiler:
     - clang
-    - gcc
 env:
     - CFLAGS="-O3"
     -

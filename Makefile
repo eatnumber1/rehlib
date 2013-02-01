@@ -1,4 +1,4 @@
-CC ?= clang
+CC := clang
 DEPGEN ?= gcc
 PKG_CONFIG ?= pkg-config
 
