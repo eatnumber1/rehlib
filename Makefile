@@ -15,7 +15,7 @@ INCDIR := $(TOPDIR)/include
 SRCDIR := $(TOPDIR)/src
 
 CPPFLAGS := $(CPPFLAGS) -I$(INCDIR)
-CFLAGS := $(CFLAGS) -std=c1x -Wall -Werror -Wextra -ggdb
+CFLAGS := $(CFLAGS) -std=gnu11 -Wall -Werror -Wextra -ggdb
 LDFLAGS := $(LDFLAGS) -fvisibility=hidden
 
 GLIB_CPPFLAGS ?= $(shell $(PKG_CONFIG) --cflags glib-2.0)
