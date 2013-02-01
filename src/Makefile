@@ -3,12 +3,10 @@
 src/all: $(REHLIB)
 
 src/clean:
-	$(RM) $(SRC_OBJECTS) $(SRC_TEST_OBJECTS) $(REHLIB) $(REHLIB_TEST)
+	$(RM) $(SRC_OBJECTS) $(SRC_TEST_OBJECTS) $(REHLIB)
 
 src/depclean:
 	$(RM) $(SRC_DEPS) $(SRC_TEST_DEPS)
-
-src/test: $(REHLIB_TEST)
 
 -include $(SRC_DEPS) $(SRC_TEST_DEPS)
 
