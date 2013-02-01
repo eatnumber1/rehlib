@@ -1,17 +1,13 @@
-#ifndef _ASTDIO_H_
-#define _ASTDIO_H_
+#ifndef _STDIO_H_
+#define _STDIO_H_
 
 #include <rehlib/common.h>
-
-#include <glib.h>
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <alloca.h>
 #include <errno.h>
-
-G_BEGIN_DECLS
 
 // int vsprintfa( char **ret, const char *format, va_list ap );
 #define vsprintfa(ret, format, ap) \
@@ -49,7 +45,5 @@ G_BEGIN_DECLS
 		} \
 		retlen; \
 	})
-
-G_END_DECLS
 
 #endif
