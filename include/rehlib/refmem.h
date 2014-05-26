@@ -1,7 +1,7 @@
 #ifndef _REFMEM_H_
 #define _REFMEM_H_
 
-#include "GBTError.h"
+#include <rehlib/GBTError.h>
 
 #include <glib.h>
 

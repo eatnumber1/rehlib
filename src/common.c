@@ -1,8 +1,11 @@
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <unistd.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #ifdef USE_GSL
 #include <gsl/gsl_errno.h>
@@ -56,3 +59,66 @@ static void CONSTRUCTOR disable_gsl_abort() {
 }
 #endif /* USE_GSL */
 #endif /* NDEBUG */
+
+bool config_try_get_intmax( const char *var_name, intmax_t *ret ) {
+	g_return_val_if_fail(ret != NULL, false);
+	g_return_val_if_fail(var_name != NULL, false);
+	char *str = getenv(var_name);
+	if( str == NULL ) return false;
+
+	char *endptr;
+	errno = 0;
+	intmax_t val = strtoimax(str, &endptr, 0);
+	if( val == 0 || errno == ERANGE ) return false;
+	if( *str == '\0' || *endptr != '\0' ) return false;
+
+	*ret = val;
+	return true;
+}
+
+bool config_try_get_uintmax( const char *var_name, uintmax_t *ret ) {
+	g_return_val_if_fail(ret != NULL, false);
+	g_return_val_if_fail(var_name != NULL, false);
+	char *str = getenv(var_name);
+	if( str == NULL ) return false;
+
+	char *endptr;
+	errno = 0;
+	uintmax_t val = strtoumax(str, &endptr, 0);
+	if( val == 0 || errno == ERANGE ) return false;
+	if( *str == '\0' || *endptr != '\0' ) return false;
+
+	*ret = val;
+	return true;
+}
+
+bool config_try_get_size( const char *var_name, size_t *ret ) {
+	g_return_val_if_fail(ret != NULL, false);
+	g_return_val_if_fail(var_name != NULL, false);
+	uintmax_t ui;
+	if( !config_try_get_uintmax(var_name, &ui) ) return false;
+	if( ui > SIZE_MAX ) return false;
+	*ret = ui;
+	return true;
+}
+
+intmax_t config_get_intmax( const char *var_name, intmax_t dflt ) {
+	g_return_val_if_fail(var_name != NULL, false);
+	intmax_t ret;
+	if( !config_try_get_intmax(var_name, &ret) ) return dflt;
+	return ret;
+}
+
+uintmax_t config_get_uintmax( const char *var_name, uintmax_t dflt ) {
+	g_return_val_if_fail(var_name != NULL, false);
+	uintmax_t ret;
+	if( !config_try_get_uintmax(var_name, &ret) ) return dflt;
+	return ret;
+}
+
+size_t config_get_size( const char *var_name, size_t dflt ) {
+	g_return_val_if_fail(var_name != NULL, false);
+	size_t ret;
+	if( !config_try_get_size(var_name, &ret) ) return dflt;
+	return ret;
+}

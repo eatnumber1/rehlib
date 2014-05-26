@@ -1,13 +1,15 @@
-#ifndef _STDIO_H_
-#define _STDIO_H_
+#ifndef _REHLIB_STDIO_H_
+#define _REHLIB_STDIO_H_
 
 #include <rehlib/common.h>
 
-#include <stdio.h>
+#include <sys/types.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <alloca.h>
 #include <errno.h>
+#include <stddef.h>
+#include <stdio.h>
 
 // int vsprintfa( char **ret, const char *format, va_list ap );
 #define vsprintfa(ret, format, ap) \
@@ -45,5 +47,7 @@
 		} \
 		retlen; \
 	})
+
+inline ssize_t ALWAYS_INLINE getdelima( char ** restrict linep, size_t * restrict linecapp, int delimiter, FILE * restrict stream );
 
 #endif

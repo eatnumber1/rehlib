@@ -1,5 +1,10 @@
 #ifndef __COMMON_H_
 #define __COMMON_H_
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -74,6 +79,14 @@ extern "C" {
 # undef G_LOG_DOMAIN
 #endif /* G_LOG_DOMAIN */
 #define G_LOG_DOMAIN "lcs"
+
+bool config_try_get_intmax( const char *var_name, intmax_t *ret );
+bool config_try_get_uintmax( const char *var_name, uintmax_t *ret );
+bool config_try_get_size( const char *var_name, size_t *ret );
+
+intmax_t config_get_intmax( const char *var_name, intmax_t dflt );
+uintmax_t config_get_uintmax( const char *var_name, uintmax_t dflt );
+size_t config_get_size( const char *var_name, size_t dflt );
 
 #ifdef __cplusplus
 }

@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#include "strton_test.h"
+
 static void test_vsprintfa_hello_internal( int dummy, ... ) {
 	char *str;
 	const char *expected = "Hello World!";
